@@ -140,7 +140,8 @@ from product p
 group by p.price;
 # 34. Tìm giá bán cao nhất, thấp nhất, trung bình của các sản phẩm bắt đầu bằng chữ M.
 select max(p.price) as max, min(p.price) as min, avg(p.price) as medium
-from product p;
+from product p
+where p.name like 'M%';
 
 # 35. Tính doanh thu bán hàng mỗi ngày.
 select totalview.total, totalview.time
@@ -175,11 +176,14 @@ group by spduoi300.id
 having sosanphamduoi300>=3;
 
 # 40. Tìm khách hàng (MAKH, HOTEN) có số lần mua hàng nhiều nhất.
+create view solanmuamax as
 select c.id, c.name, count(od.orderId) as solanmua
 from demo2006.customer c join demo2006.order o join demo2006.orderdetail od on c.id = o.customerId and o.id = od.orderId
-group by c.id
-order by solanmua desc
-limit 1;
+group by c.id;
+select solanmuamax.id, solanmuamax.name, solanmuamax.solanmua
+from solanmuamax
+where solanmuamax.solanmua = (select max(solanmuamax.solanmua) from solanmuamax);
+
 
 # 41. Tháng mấy trong năm 2006, doanh số bán hàng cao nhất?
 create view doanhsotheothang as
@@ -204,9 +208,9 @@ from luongbansp2006;
 
 # 45. Trong 10 khách hàng có doanh số cao nhất, tìm khách hàng có số lần mua hàng nhiều nhất.
 create view doanhso as
-select c.name, sum(p.price*od.quantity) as tong,count(od.orderId) as solanmua
+select c.name, sum(p.price*od.quantity) as tong, count(od.orderId) as solanmua
 from demo2006.customer c join demo2006.order o  join demo2006.orderdetail od join demo2006.product p on o.id = od.orderId and p.id = od.productId and o.customerId = c.id
-group by od.orderId
+group by o.customerId
 order by tong desc
 limit 10;
 select *
